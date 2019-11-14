@@ -17,7 +17,7 @@ class App extends Component {
 
   getOwners = () => {
     axios({
-      url: `{serverUrl}/owners`,
+      url: `${serverUrl}/owners`,
       method: 'get'
     })
       .then(response => {
@@ -27,7 +27,7 @@ class App extends Component {
 
   getPets = () => {
     axios({
-      url: `{serverUrl}/pets`,
+      url: `${serverUrl}/pets`,
       method: 'get'
     })
       .then(response => {
@@ -40,7 +40,7 @@ class App extends Component {
   createPet = e => {
     e.preventDefault()
     axios({
-      url: `{serverUrl}/pets`,
+      url: `${serverUrl}/pets`,
       method: 'post',
       data: { newPet: this.state.newPet }
     })
@@ -75,7 +75,7 @@ class App extends Component {
 
   deleteOwner = e => {
     axios({
-      url: `${ownerUrl}/owner/${e.target.id}`,
+      url: `${serverUrl}/owner/${e.target.id}`,
       method: 'delete'
     })
       .then(response => {
