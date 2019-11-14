@@ -16,7 +16,7 @@
 - Connect Sequelize to an exisiting Postgres database
 - Explain the advantages of using Sequelize vs writing SQL queries from scratch
 - Learn to use Postman to test our routes before building a view
-- Describe how to create a one to many relationship using Sequelize associations
+
 
 <br>
 
@@ -30,10 +30,10 @@ For example, to find all the instances of a user in a database:
 
 ```js
 // SQL query 
-SELECT * FROM users;
+SELECT * FROM pets;
 
 // Sequelize query
-User.findAll()
+Pet.findAll()
 ```
 
 Sequelize is super helpful when dealing with asynchronicity and associations (joins) between tables.
@@ -46,12 +46,11 @@ The Sequelize CLI (command line interface) makes it easy to add Sequelize to an 
 
 - [Sequelize CLI GitHub](https://github.com/sequelize/cli)
 - [Sequelize CLI Docs](http://docs.sequelizejs.com/manual/tutorial/migrations.html)
+- [Docs](https://sequelize.org/master/)
 
+Run this from the backend express app folder: 
 
-To install globally, run this Terminal command from any directory:
-
-`npm install -g sequelize-cli`
-
+`npm install sequelize sequelize-cli pg`
 
 #### Sequelize Init in an App
 
@@ -61,37 +60,34 @@ To use the Sequelize CLI we run `sequelize init` in the root directory of our ap
 
 We'll be walking through these in more detail.
 
-<br>
 
-## Let's Build A New App for this lesson!
-
-1. `express sequelize-express-lesson-app --ejs --git`
-2. `cd` and `npm install`
-- `npm install --save sequelize pg pg-hstore`
-	- [`pg`](https://www.npmjs.com/package/pg) is the PostgreSQL client for Node.js. 
-	- [`pg-hstore`](https://www.npmjs.com/package/pg-hstore) is a node package for serializing and deserializing JSON data to hstore format. It allows us to save non-relational data (objects) in a relational database.
-- `createdb sequelize-express-lesson-app-development`
-	- This is the Postgres database we'll create for this lesson
-	- Make sure you run this from the command line *NOT* from inside `psql`  
-	- How can we confirm that the database was created?
-- `sequelize init`
-	- This will create the files and folders listed above^^
-- In our `package.json`, update the npm start script to `nodemon ./bin/www` 
-
-<br>
-
-## Configure database details
+#### Configure database details
 
 One of the files + folders that the Sequelize CLI created for us is `config/config.json`. Typically, we'd have 3 seperate databases for each environment (test, development, production). Why not use the same database for each?
 
 Let's update the file to this:
 
+`config/config.json`
+
 ```js
 {
   "development": {
-    "database": "sequelize-express-lesson-app-development",
+    "database": "pets_app_development",
     "host": "127.0.0.1",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "test": {
+    "database": "pets_app_test",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  },
+  "production": {
+    "database": "pets_app_production",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
   }
 }
 ```
@@ -105,7 +101,10 @@ What did we change?
 
 <br>
 
-## Create a `User` model
+4. `createdb pets_app_development`
+
+
+#### Create a `Pet` model
 
 Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbing in here! Mainly, this file...
 
@@ -113,45 +112,36 @@ Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbin
 - Helps to set up associations between models
 - DRYs up our code. Importing this one file will give us access to all models.
 
-Let's use the Sequelize CLI `model:generate` command to create a User model with `firstName`, `lastName`, and `email` String attributes:
+Let's use the Sequelize CLI `model:generate` command to create a Pet model with `name` and `owner` String attributes:
 
 
-`sequelize model:generate --name user --attributes firstName:string,lastName:string,email:string`
+`sequelize model:generate --name Pet --attributes name:string,breed:string`
 
 - **IMPORTANT**: Make sure that there are **NO** spaces after the commas.
 
 ![](https://i.imgur.com/AMN35p4.png)
 
-Two files were created for us the first is the `models/user.js` model file
-
-<br>
-
-#### `models/user.js`
-
-Here is what the CLI generated for us:
+Two files were created for us the first is the `models/pet.js` model file.
 
 ```js
-// models/user.js
-
 'use strict';
 module.exports = (sequelize, DataTypes) => {
-  var User = sequelize.define('user', {
-    firstName: DataTypes.STRING,
-    lastName: DataTypes.STRING,
-    email: DataTypes.STRING
+  const Pet = sequelize.define('Pet', {
+    name: DataTypes.STRING
   }, {});
-  User.associate = function(models) {
+  Pet.associate = function(models) {
     // associations can be defined here
   };
-  return User;
+  return Pet;
 };
 ```
 
 This file describes what attributes and methods each instance of a User should have in our database. How are attributes stored in our database?
 
+
 <br>
 
-#### `migrations/<TIMESTAMP>-create-user.js`
+#### `migrations/<TIMESTAMP>-create-pet.js`
 
 Migrations are how we manage the state of our database. Notice that each file is prefaced with a timestamp. You'll learn more about migrations tomorrow. Here's the file:
 
@@ -159,20 +149,14 @@ Migrations are how we manage the state of our database. Notice that each file is
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('users', {
+    return queryInterface.createTable('Pets', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      firstName: {
-        type: Sequelize.STRING
-      },
-      lastName: {
-        type: Sequelize.STRING
-      },
-      email: {
+      name: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -186,32 +170,61 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('users');
+    return queryInterface.dropTable('Pets');
   }
 };
 ```
 
-This file tells the database to create a `users` table. It also defines each column's name and Sequelize datatype.
+This file tells the database to create a `pets` table. It also defines each column's name and Sequelize datatype.
 
 <br>
 
 
 #### Run the Migrations
 
-So far we've created a migration file, but our database has not recieved the instructions. We need to run our migrations folder to tell the database what we want it to look like. _You'll go over this more in depth tomorrow._ Let's run this command from the root directory of your app: 
+So far we've created a migration file, but our database has not recieved the instructions. We need to run our migrations folder to tell the database what we want it to look like. Let's run this command from the root directory of your app: 
 
 `sequelize db:migrate` 
 
-This will run our `create-user` migration file.
+This will run our `create-pet` migration file.
 
-![](https://i.imgur.com/bakIvjv.png)
+![](https://i.imgur.com/GbVg6Uv.png)
 
-Just to confirm, let's go into the `psql` shell and confirm that a `users` table has been created.
+Just to confirm, let's go into the `psql` shell and confirm that a `pets` table has been created.
 
 1. `psql` - You can run this command from any directory to enter the Postgres shell
 2. `\l` - See the list of databases
-3. `\c sequelize-express-lesson-db-development` - Connect to our database	
+3. `\c pets_app_development` - Connect to our database
 4. `\dt` - This will show the database tables
+
+<br>
+
+#### Add a column to the Database:
+
+1. `sequelize migration:generate --name add-owner-to-pets`
+
+```js
+'use strict';
+
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.addColumn('Pets', 'owner', { type: Sequelize.STRING });
+  },
+  down: (queryInterface, Sequelize) => {
+    /*
+      Add reverting commands here.
+      Return a promise to correctly handle asynchronicity.
+
+      Example:
+      return queryInterface.dropTable('users');
+    */
+  }
+};
+```
+
+1. `sequelize db:migrate`
+
+
 
 <br>
 
@@ -223,45 +236,53 @@ Just to confirm, let's go into the `psql` shell and confirm that a `users` table
 4. What are the 4 folders that the Sequelize CLI created for us?
 5. What do the `up` and `down` methods in our migration file do?
 6. TRUE or FALSE: Generating a migration file automatically alters the schema of the database?
-
+	
 <br>
 
-## Create database seeds for User
+## Create database seeds for Pet
 
 The last folder that Seqelize created for us is a seeders folder. This is where we can add seeds for our database. Why might seeds be useful?
 
-Let's have the Sequelize CLI scaffold a timestamped file for `User` seeds in the seeders folder:
+Let's have the Sequelize CLI scaffold a timestamped file for `Pet` seeds in the seeders folder:
 
-`sequelize seed:generate --name demo-users`
+`sequelize seed:generate --name demo-pets`
 
 This created an empty seeders file. Fill it in like so:
 
 ```js
 'use strict';
-
+	
 module.exports = {
-  up: (queryInterface, Sequelize) => {  
-      return queryInterface.bulkInsert('users', [
-        {
-          firstName: 'Marc',
-          lastName: 'Wright',
-          email: 'marc@ga.co',
-          createdAt: Sequelize.literal('NOW()'),
-          updatedAt: Sequelize.literal('NOW()')
-        },
-        {
-          firstName: 'Diesel',
-          lastName: 'Wright',
-          email: 'diesel@bark.co',
-          createdAt: Sequelize.literal('NOW()'),
-          updatedAt: Sequelize.literal('NOW()')
-        }
-      ], {});
-
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.bulkInsert('Pets', [
+      {
+        name: 'Diesel',
+        owner: 'Marc',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'Creamy',
+        owner: 'Cheryl',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        name: 'Ravoli',
+        owner: 'Tyler,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }], {});
   },
-
+	
   down: (queryInterface, Sequelize) => {
-      return queryInterface.bulkDelete('users', null, {});
+    /*
+      Add reverting commands here.
+      Return a promise to correctly handle asynchronicity.
+	
+      Example:
+      return queryInterface.bulkDelete('Pets', null, {});
+    */
   }
 };
 ```
@@ -278,120 +299,29 @@ module.exports = {
 
 ##### Seed your Database Table
 
-Run `sequelize db:seed:all` to seed your `users` table.
+Run `sequelize db:seed:all` to seed your `pets` table.
 
 ##### Confirm in `psql`
 
-Run `SELECT * FROM users;`
-
-![](https://i.imgur.com/QzarwDy.png)
+Run `SELECT * FROM pets;`
 
 <br>
 
-## Add Sequelize queries inside our routes
+### Require the Pet model in the pets routes file
 
-[Sequelize Queries](http://docs.sequelizejs.com/manual/tutorial/querying.html)
-
-We'll use the exisiting `routes/users` controller that the Express Generator gave us to build out our Sequelize routes.
-
-<br>
-
-### Require the User model in the users controller
-
-First things first, we need to let our controller know about the `User` model. We'll `require` the Sequelize `models/index.js` file. This file essentally `exports` an object that contains a property for each model.
+First things first, we need to let our routes file know about the `Pet` model. We'll `require` the Sequelize `models/index.js` file. This file essentally `exports` an object that contains a property for each model.
 
 ```js
-// At the top of the users controller
+// At the top of the pets routes file
 
-var User = require('../models').user
+const Pet = require('../models').Pet
 ```
-
-<br>
-
-## Sequelize
-
-[Docs](https://sequelize.org/master/)
-
-1. `npm install sequelize sequelize-cli pg`
-2. `sequelize init`
-3. `config/config.json`
-
-	```js
-	{
-	  "development": {
-	    "database": "pets_app_development",
-	    "host": "127.0.0.1",
-	    "dialect": "postgres",
-	    "operatorsAliases": false
-	  },
-	  "test": {
-	    "database": "pets_app_test",
-	    "host": "127.0.0.1",
-	    "dialect": "postgres",
-	    "operatorsAliases": false
-	  },
-	  "production": {
-	    "database": "pets_app_production",
-	    "host": "127.0.0.1",
-	    "dialect": "postgres",
-	    "operatorsAliases": false
-	  }
-	}
-	```
-
-4. `createdb pets_app_development`
-5. `sequelize model:generate --name Pet --attributes name:string`
-6. `sequelize db:migrate`
-
-	![](https://i.imgur.com/GbVg6Uv.png)
-	
-<br>
-
-## Create pet seeds
-
-1. `sequelize seed:generate --name demo-pets`
-2. Add this:
-
-	```js
-	'use strict';
-	
-	module.exports = {
-	  up: (queryInterface, Sequelize) => {
-	    return queryInterface.bulkInsert('Pets', [
-	      {
-	        name: 'Diesel',
-	        createdAt: new Date(),
-	        updatedAt: new Date()
-	      },
-	      {
-	        name: 'Creamy',
-	        createdAt: new Date(),
-	        updatedAt: new Date()
-	      },
-	      {
-	        name: 'Ravoli',
-	        createdAt: new Date(),
-	        updatedAt: new Date()
-	      }], {});
-	  },
-	
-	  down: (queryInterface, Sequelize) => {
-	    /*
-	      Add reverting commands here.
-	      Return a promise to correctly handle asynchronicity.
-	
-	      Example:
-	      return queryInterface.bulkDelete('People', null, {});
-	    */
-	  }
-	};
-	```
-3. `sequelize db:seed:all`
 
 <br>
 
 ## Get All Pets
 
+[Sequelize Queries](http://docs.sequelizejs.com/manual/tutorial/querying.html)
 [Sequelize Docs](https://sequelize.org/master/manual/models-usage.html)
 
 `routes/pets.js`:
