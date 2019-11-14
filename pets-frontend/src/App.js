@@ -75,7 +75,7 @@ class App extends Component {
 
   deleteOwner = e => {
     axios({
-      url: `${serverUrl}/owner/${e.target.id}`,
+      url: `${serverUrl}/owners/${e.target.id}`,
       method: 'delete'
     })
       .then(response => {
