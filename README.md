@@ -269,7 +269,7 @@ module.exports = {
       },
       {
         name: 'Ravoli',
-        owner: 'Tyler,
+        owner: 'Tyler',
         createdAt: new Date(),
         updatedAt: new Date()
       }], {});
