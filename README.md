@@ -257,19 +257,19 @@ module.exports = {
     return queryInterface.bulkInsert('Pets', [
       {
         name: 'Diesel',
-        owner: 'Marc',
+        breed: 'Terrier',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Creamy',
-        owner: 'Cheryl',
+        breed: 'cat',
         createdAt: new Date(),
         updatedAt: new Date()
       },
       {
         name: 'Ravoli',
-        owner: 'Tyler',
+        breed: 'cat',
         createdAt: new Date(),
         updatedAt: new Date()
       }], {});
