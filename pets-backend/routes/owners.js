@@ -6,7 +6,11 @@ const Pet = require('../models').Pet
 // INDEX FOR ALL OWNERS
 router.get('/', (req, res) => {
   Owner.findAll({
-    include: [{ model: Pet }]
+    include: [{
+      model: Pet,
+      attributes: ['name', 'breed', 'age']
+    }],
+    attributes: ['firstName', 'lastName']
   })
     .then(owners => {
       res.json({ owners })
