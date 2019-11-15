@@ -8,16 +8,22 @@ module.exports = {
           {
             name: 'Diesel',
             breed: 'Terrier',
+            age: 2,
+            ownerId: 1,
             createdAt: new Date(),
             updatedAt: new Date()
           }, {
             name: 'Timmy',
             breed: 'cat',
+            age: 2,
+            ownerId: 1,
             createdAt: new Date(),
             updatedAt: new Date()
           }, {
             name: 'Crowley',
             breed: 'black',
+            age: 2,
+            ownerId: 2,
             createdAt: new Date(),
             updatedAt: new Date()
           }

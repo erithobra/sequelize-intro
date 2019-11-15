@@ -1,12 +1,25 @@
 const express = require('express');
 const router = express.Router()
 const Owner = require('../models').Owner
+const Pet = require('../models').Pet
 
 // INDEX FOR ALL OWNERS
 router.get('/', (req, res) => {
-  Owner.findAll()
+  Owner.findAll({
+    include: [{ model: Pet }]
+  })
     .then(owners => {
       res.json({ owners })
+    })
+})
+
+router.get('/:id', (req, res) => {
+  let foundOwner = {}
+  Owner.findByPk(req.params.id, {
+    include: [{ model: Pet }]
+  })
+    .then(owner => {
+      res.json({ owner })
     })
 })
 
