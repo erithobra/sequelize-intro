@@ -88,6 +88,10 @@ CREATE DATABASE
 
 #### Create a `Fruit` model
 
+Before we start with creating a fruit model, lets make one small change in our existing app. We will move `models\fruits.js` file from models folder to the parent folder, that is directly under `fruit-app`. And since we have changed the location of this file we will change the import in `controllers/fruits.js` to `const fruits = require('../fruits.js')`
+
+**Make sure you make the above change before moving forward**
+
 Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbing in here! Mainly, this file...
 
 - Imports the Sequelize module once and shares it between all models we create
@@ -159,55 +163,19 @@ Just to confirm, let's go into the `psql` shell and confirm that a `pets` table 
 6. TRUE or FALSE: Generating a migration file automatically alters the schema of the database?
 	
 
-## Create database seeds for Pet
+## Create database seeds for Fruit
 
-The last folder that Seqelize created for us is a seeders folder. This is where we can add seeds for our database. Why might seeds be useful?
+The last folder that Seqelize created for us is a `seeders` folder. This is where we can add seeds for our database. Why might seeds be useful?
 
-Let's have the Sequelize CLI scaffold a timestamped file for `Pet` seeds in the seeders folder:
+Let's have the Sequelize CLI scaffold a timestamped file for `Fruit` seeds in the seeders folder:
 
-`sequelize seed:generate --name demo-pets`
+`sequelize seed:generate --name demo-fruits`
 
 This created an empty seeders file. Fill it in like so:
 
 ```js
-'use strict';
-	
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('Pets', [
-      {
-        name: 'Diesel',
-        breed: 'Terrier',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: 'Creamy',
-        breed: 'cat',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      },
-      {
-        name: 'Ravoli',
-        breed: 'cat',
-        createdAt: new Date(),
-        updatedAt: new Date()
-      }], {});
-  },
-	
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-	
-      Example:
-      return queryInterface.bulkDelete('Pets', null, {});
-    */
-  }
-};
+'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.bulkInsert('Fruits', [      {          name:'apple',          color: 'red',          readyToEat: true,          createdAt: new Date(),          updatedAt: new Date()      },      {          name:'pear',          color: 'green',          readyToEat: false,          createdAt: new Date(),          updatedAt: new Date()      },      {          name:'banana',          color: 'yellow',          readyToEat: true,          createdAt: new Date(),          updatedAt: new Date()      }    ], {});  },  down: (queryInterface, Sequelize) => {    /*      Add reverting commands here.      Return a promise to correctly handle asynchronicity.      Example:      return queryInterface.bulkDelete('Fruits', null, {});    */  }};
 ```
-
-<br>
 
 #### What's going on here!?
 
@@ -215,73 +183,82 @@ module.exports = {
 - `queryInterface.bulkInsert` is an efficent Sequelize method to dump an array of objects into our database all at once.
 - We're also adding some `createdAt` and `updatedAt` fields since those are required.
 
-<br>
 
 ##### Seed your Database Table
 
-Run `sequelize db:seed:all` to seed your `pets` table.
+Run `sequelize db:seed:all` to seed your `fruits` table.
 
 ##### Confirm in `psql`
 
-Run `SELECT * FROM pets;`
+Run `SELECT * FROM "Fruits";`
 
-<br>
 
-### Require the Pet model in the pets routes file
-
-First things first, we need to let our routes file know about the `Pet` model. We'll `require` the Sequelize `models/index.js` file. This file essentally `exports` an object that contains a property for each model.
-
-```js
-// At the top of the pets routes file
-
-const Pet = require('../models').Pet
-```
-
-<br>
-
-## Get All Pets
+## Update Controller
 
 [Sequelize Queries](http://docs.sequelizejs.com/manual/tutorial/querying.html)
 [Sequelize Docs](https://sequelize.org/master/manual/models-usage.html)
 
-`routes/pets.js`:
+
+### Require the Fruit model in the fruits.js controller file
+
+First things first, we need to let our controller file `controllers/fruits.js` know about the `Fruit` model. We'll `require` the Sequelize `models/index.js` file. This file essentally `exports` an object that contains a property for each model.
 
 ```js
-// DELETE const pets = []
-const Pet = require('./models').Pet
-	
-/* GET pets */
-router.get('/', (req, res) => {
-  Pet.findAll()
-    .then(pets => {
-      res.json({ pets });
-    })
-});
+// At the top of the file
+
+const Fruit = require('../models').Fruit;
 ```
-	
-![](https://i.imgur.com/gWM55YT.png)
 
-<br>
+Now we are going to update all our controller functions one by one.
 
-## Get one pet
+`controllers/fruits.js`:
 
-[Sequelize Docs](https://sequelize.org/master/manual/models-usage.html)
+### Get All Fruits (index())
 
-`routes/pets.js`:
+We will update our index funtion to query the database to get all fruits and just like earlier render `index.ejs` view to display all fruits.
+
+Previously,
+
+```
+```
+
+Now,
 
 ```js
-/* GET one pet */
-router.get('/:id', (req, res) => {
-  Pet.findByPk(req.params.id)
-    .then(pet => {
-      res.json({ pet })
-    })
-})
+const index = (req, res) => {    Fruit.findAll()    .then(fruits => {        res.render('index.ejs', {            fruits : fruits        });    })    };
+```
+	
+
+### Get one Fruit (show())
+
+Previously,
+
+```
+const show = (req, res) => {    res.render('show.ejs', {        fruit: fruits[req.params.index]    });}
 ```
 
-![](https://i.imgur.com/GzKDlPu.png)
+Now,
 
-<br>
+```js
+const show = (req, res) => {    Fruit.findByPk(req.params.index)    .then(fruit => {        res.render('show.ejs', {            fruit: fruit        });    })}
+```
+
+To have the link work we will have to make one more change in `views/index.ejs`. Currently the input sent in url is the index of the fruit since earlier `fruits` was an array. Like this,
+
+```
+...
+	The <a href="/fruits/<%=i%>"><%=fruits[i].name; %></a> is  <%=fruits[i].color; %>.
+...
+```
+
+But now we will send `fruit.id` as input in the URL so that id can be used to query the database.
+
+```
+...
+	The <a href="/fruits/<%=fruits[i].id%>"><%=fruits[i].name; %></a> is  <%=fruits[i].color; %>.
+...
+```
+
 
 ## Create a pet
 
