@@ -1,10 +1,3 @@
-- [Completed Frontend](https://git.generalassemb.ly/Interapt/express-pet-app-frontend)
-- [Completed Backend](https://git.generalassemb.ly/Interapt/express-pet-app-backend)
-
-
-<br>
-
-<br>
 
 ![](https://i.imgur.com/yvEYhnZ.png)
 
@@ -24,19 +17,19 @@
 
 [Sequelize](http://docs.sequelizejs.com/) is a promise-based ORM (Object Relational Mapper) for Node.js v4 and up. It supports the dialects PostgreSQL, MySQL, SQLite and MSSQL and features solid transaction support, relations, read replication and more.
 
-With jQuery, we created jQuery objects that wrapped our DOM nodes with helpful methods and properties. Similarily, Sequelize creates objects that wrap our data in extra methods, properties and Promises. Additionally, since Sequelize is written in Javascript, we'll use Object Oriented Programming to create our SQL queries.
+Sequelize creates objects that wrap our data in extra methods, properties and Promises. Additionally, since Sequelize is written in Javascript, we'll use Object Oriented Programming to create our SQL queries.
 
 For example, to find all the instances of a user in a database:
 
 ```js
 // SQL query 
-SELECT * FROM pets;
+SELECT * FROM fruits;
 
 // Sequelize query
-Pet.findAll()
+Fruit.findAll()
 ```
 
-Sequelize is super helpful when dealing with asynchronicity and associations (joins) between tables.
+Sequelize is super helpful when dealing with asynchronicity and associations (joins) between tables. We'll talk about it more later.
 
 <br>
 
@@ -48,9 +41,19 @@ The Sequelize CLI (command line interface) makes it easy to add Sequelize to an 
 - [Sequelize CLI Docs](http://docs.sequelizejs.com/manual/tutorial/migrations.html)
 - [Docs](https://sequelize.org/master/)
 
-Run this from the backend express app folder: 
+Run this from your cmd prompt: 
 
-`npm install sequelize sequelize-cli pg`
+```
+npm install -g sequelize-cli
+npm install sequelize
+npm install pg --save
+```
+
+After that run `sequelize`, if successfully installed you should see
+
+```
+Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]sequelize [command]Commands:  sequelize db:migrate                        Run pending migrations  sequelize db:migrate:schema:timestamps:add  Update migration table to have timestamps  sequelize db:migrate:status                 List the status of all migrations  sequelize db:migrate:undo                   Reverts a migration  sequelize db:migrate:undo:all               Revert all migrations ran  sequelize db:seed                           Run specified seeder  sequelize db:seed:undo                      Deletes data from the database  sequelize db:seed:all                       Run every seeder  sequelize db:seed:undo:all                  Deletes data from the database  sequelize db:create                         Create database specified by configuration  sequelize db:drop                           Drop database specified by configuration  sequelize init                              Initializes project  sequelize init:config                       Initializes configuration  sequelize init:migrations                   Initializes migrations  sequelize init:models                       Initializes models  sequelize init:seeders                      Initializes seeders  sequelize migration:generate                Generates a new migration file                 [aliases: migration:create]  sequelize model:generate                    Generates a model and its migration                [aliases: model:create]  sequelize seed:generate                     Generates a new seed file                           [aliases: seed:create]Options:  --help     Show help                                                                                         [boolean]  --version  Show version number                                                                               [boolean]
+```
 
 #### Sequelize Init in an App
 
@@ -70,41 +73,27 @@ Let's update the file to this:
 `config/config.json`
 
 ```js
-{
-  "development": {
-    "database": "pets_app_development",
-    "host": "127.0.0.1",
-    "dialect": "postgres",
-    "operatorsAliases": false
-  },
-  "test": {
-    "database": "pets_app_test",
-    "host": "127.0.0.1",
-    "dialect": "postgres",
-    "operatorsAliases": false
-  },
-  "production": {
-    "database": "pets_app_production",
-    "host": "127.0.0.1",
-    "dialect": "postgres",
-    "operatorsAliases": false
-  }
-}
+{  "development": {    "username": "postgres",    "password": "postgres",    "database": "fruits_dev",    "host": "127.0.0.1",    "dialect": "postgres",    "operatorsAliases": false  }}
 ```
 
 What did we change?
 
 - _Optional_: We're only using a development database today so we removed the other environments.
-- We deleted `username` and `password` fields because we don't need them today.
 - We make sure the `database` value is the one we created.
 - We change the dialect to `postgres` since that's the type of database we're using.
 
 <br>
 
-4. `createdb pets_app_development`
+4. Go back to cmd prompt and connect to postgres
 
+```
+psql -U postgres
 
-#### Create a `Pet` model
+postgres=# CREATE DATABASE fruits_dev;
+CREATE DATABASE
+```
+
+#### Create a `Fruit` model
 
 Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbing in here! Mainly, this file...
 
@@ -115,69 +104,27 @@ Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbin
 Let's use the Sequelize CLI `model:generate` command to create a Pet model with `name` and `owner` String attributes:
 
 
-`sequelize model:generate --name Pet --attributes name:string,breed:string`
+`sequelize model:generate --name Fruit --attributes name:string,color:string,readyToEat:boolean`
 
 - **IMPORTANT**: Make sure that there are **NO** spaces after the commas.
 
-![](https://i.imgur.com/AMN35p4.png)
-
-Two files were created for us the first is the `models/pet.js` model file.
+Two files were created for us the first is the `models/fruit.js` model file.
 
 ```js
-'use strict';
-module.exports = (sequelize, DataTypes) => {
-  const Pet = sequelize.define('Pet', {
-    name: DataTypes.STRING
-  }, {});
-  Pet.associate = function(models) {
-    // associations can be defined here
-  };
-  return Pet;
-};
+'use strict';module.exports = (sequelize, DataTypes) => {  const Fruit = sequelize.define('Fruit', {    name: DataTypes.STRING,    color: DataTypes.STRING,    readyToEat: DataTypes.BOOLEAN  }, {});  Fruit.associate = function(models) {    // associations can be defined here  };  return Fruit;};
 ```
 
-This file describes what attributes and methods each instance of a User should have in our database. How are attributes stored in our database?
+This file describes what attributes and methods each instance of a `Fruit` should have in our database. How are attributes stored in our database?
 
-
-<br>
-
-#### `migrations/<TIMESTAMP>-create-pet.js`
+#### `migrations/<TIMESTAMP>-create-fruit.js`
 
 Migrations are how we manage the state of our database. Notice that each file is prefaced with a timestamp. You'll learn more about migrations tomorrow. Here's the file:
 
 ```js
-'use strict';
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Pets', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER
-      },
-      name: {
-        type: Sequelize.STRING
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE
-      }
-    });
-  },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Pets');
-  }
-};
+'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.createTable('Fruits', {      id: {        allowNull: false,        autoIncrement: true,        primaryKey: true,        type: Sequelize.INTEGER      },      name: {        type: Sequelize.STRING      },      color: {        type: Sequelize.STRING      },      readyToEat: {        type: Sequelize.BOOLEAN      },      createdAt: {        allowNull: false,        type: Sequelize.DATE      },      updatedAt: {        allowNull: false,        type: Sequelize.DATE      }    });  },  down: (queryInterface, Sequelize) => {    return queryInterface.dropTable('Fruits');  }};
 ```
 
-This file tells the database to create a `pets` table. It also defines each column's name and Sequelize datatype.
-
-<br>
+This file tells the database to create a `fruits` table. It also defines each column's name and Sequelize datatype.
 
 
 #### Run the Migrations
@@ -186,18 +133,19 @@ So far we've created a migration file, but our database has not recieved the ins
 
 `sequelize db:migrate` 
 
-This will run our `create-pet` migration file.
+```
+Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]Loaded configuration file "config\config.json".Using environment "development".(node:11100) [SEQUELIZE0004] DeprecationWarning: A boolean value was passed to options.operatorsAliases. This is a no-op with v5 and should be removed.== 20200518203858-create-fruit: migrating ========= 20200518203858-create-fruit: migrated (0.058s)
+```
 
-![](https://i.imgur.com/GbVg6Uv.png)
+This will run our `create-fruit` migration file.
 
 Just to confirm, let's go into the `psql` shell and confirm that a `pets` table has been created.
 
 1. `psql` - You can run this command from any directory to enter the Postgres shell
 2. `\l` - See the list of databases
-3. `\c pets_app_development` - Connect to our database
+3. `\c fruits_dev` - Connect to our database
 4. `\dt` - This will show the database tables
 
-<br>
 
 #### Add a column to the Database:
 
@@ -429,179 +377,3 @@ router.put('/:id', (req, res) => {
 ```
 
 ![](https://i.imgur.com/7k9A1we.png)
-
-<br>
-
-## Update React Frontend
-
-1. Create new pet
-
-```js
-import React from 'react';
-import './App.css';
-import axios from 'axios';
-const serverUrl = 'http://localhost:3000'
-
-class App extends React.Component {
-  state = {
-    pets: [],
-    newPet: ''
-  }
-
-  componentDidMount() {
-    this.getPets()
-
-  }
-
-  getPets = () => {
-    axios({
-      url: `${serverUrl}/api/pets`,
-      method: 'get'
-    })
-      .then(response => {
-        console.log(response.data)
-        this.setState({ pets: response.data.pets })
-      })
-  }
-
-  handleChange = e => {
-    this.setState({ newPet: e.target.value })
-  }
-
-  createPet = e => {
-    e.preventDefault()
-    let newPetObject = {
-      petName: this.state.newPet
-    }
-
-    axios({
-      url: `${serverUrl}/api/pets`,
-      method: 'post',
-      data: newPetObject
-    })
-      .then(response => {
-        console.log(response.data)
-        this.setState((prevState, currentState) => (
-          { pets: [...prevState.pets, response.data.pet] }
-        ))
-      })
-  }
-
-  render() {
-    console.log(this.state)
-    const allPetEls = this.state.pets.map((pet, index) => {
-      return <li key={index}>{pet.name || ''}</li>
-    })
-    return (
-      <div className="App">
-        <h1>Pets!</h1>
-        <form onSubmit={this.createPet}>
-          <input type="text" onChange={e => this.handleChange(e)} />
-          <input type="submit" value="Create New Pet" />
-        </form>
-        <ul>
-          {allPetEls}
-        </ul>
-      </div>
-    );
-  }
-}
-
-export default App;
-```
-
-## Delete Pet
-
-![](https://i.imgur.com/K6Qn7dP.png)
-
-```js
-import React from 'react';
-import './App.css';
-import axios from 'axios';
-const serverUrl = 'http://localhost:3000'
-
-class App extends React.Component {
-  state = {
-    pets: [],
-    newPet: ''
-  }
-
-  componentDidMount() {
-    this.getPets()
-
-  }
-
-  deletePet = (e) => {
-    e.preventDefault()
-    let petToDeleteId = e.target.id
-    console.log(petToDeleteId)
-    axios({
-      url: `${serverUrl}/api/pets/${petToDeleteId}`,
-      method: 'delete'
-    })
-      .then(response => {
-        console.log(response.data)
-        this.setState({ pets: response.data.pets })
-      })
-
-  }
-
-  getPets = () => {
-    axios({
-      url: `${serverUrl}/api/pets`,
-      method: 'get'
-    })
-      .then(response => {
-        console.log(response.data.pets)
-        this.setState({ pets: response.data.pets })
-      })
-  }
-
-  handleChange = e => {
-    this.setState({ newPet: e.target.value })
-  }
-
-  createPet = e => {
-    e.preventDefault()
-    let newPetObject = {
-      petName: this.state.newPet
-    }
-
-    axios({
-      url: `${serverUrl}/api/pets`,
-      method: 'post',
-      data: newPetObject
-    })
-      .then(response => {
-        console.log(response.data)
-        this.setState((prevState, currentState) => (
-          { pets: [...prevState.pets, response.data.pet] }
-        ))
-      })
-  }
-
-  render() {
-    console.log(this.state)
-    const allPetEls = this.state.pets.map((pet, index) => {
-      return <li key={index}>
-        {pet.name || ''}{'  '}
-        <button id={pet.id} onClick={this.deletePet}>delete</button>
-      </li>
-    })
-    return (
-      <div className="App">
-        <h1>Pets!</h1>
-        <form onSubmit={this.createPet}>
-          <input type="text" onChange={e => this.handleChange(e)} />
-          <input type="submit" value="Create New Pet" />
-        </form>
-        <ul>
-          {allPetEls}
-        </ul>
-      </div>
-    );
-  }
-}
-
-export default App;
-```
