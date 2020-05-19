@@ -1,7 +1,6 @@
 
 ![](https://i.imgur.com/yvEYhnZ.png)
 
-<br>
 
 ## Objectives
 
@@ -10,8 +9,6 @@
 - Explain the advantages of using Sequelize vs writing SQL queries from scratch
 - Learn to use Postman to test our routes before building a view
 
-
-<br>
 
 ## What is Sequelize?
 
@@ -30,8 +27,6 @@ Fruit.findAll()
 ```
 
 Sequelize is super helpful when dealing with asynchronicity and associations (joins) between tables. We'll talk about it more later.
-
-<br>
 
 ## Sequelize CLI
 
@@ -82,8 +77,6 @@ What did we change?
 - We make sure the `database` value is the one we created.
 - We change the dialect to `postgres` since that's the type of database we're using.
 
-<br>
-
 4. Go back to cmd prompt and connect to postgres
 
 ```
@@ -126,6 +119,8 @@ Migrations are how we manage the state of our database. Notice that each file is
 
 This file tells the database to create a `fruits` table. It also defines each column's name and Sequelize datatype.
 
+A Migration in Sequelize is javascript file which exports two functions, `up` and `down`, that dictate how to perform the migration and undo it. You define those functions manually, but you don't call them manually; they will be called automatically by the CLI. In these functions, you should simply perform whatever queries you need, with the help of `sequelize.query` and whichever other methods Sequelize provides to you.
+
 
 #### Run the Migrations
 
@@ -133,11 +128,18 @@ So far we've created a migration file, but our database has not recieved the ins
 
 `sequelize db:migrate` 
 
+This command will execute these steps:
+
+- Will ensure a table called `SequelizeMeta` in database. This table is used to record which migrations have run on the current database
+- Start looking for any migration files which haven't run yet. This is possible by checking SequelizeMeta table. In this case it will run `XXXXXXXXXXXXXX-create-fruit.js` migration, which we created in last step.
+- Creates a table called `Fruits` with all columns as specified in its migration file.
+
+This is what you'll see on cmd prompt after running the above command,
+
 ```
 Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]Loaded configuration file "config\config.json".Using environment "development".(node:11100) [SEQUELIZE0004] DeprecationWarning: A boolean value was passed to options.operatorsAliases. This is a no-op with v5 and should be removed.== 20200518203858-create-fruit: migrating ========= 20200518203858-create-fruit: migrated (0.058s)
 ```
 
-This will run our `create-fruit` migration file.
 
 Just to confirm, let's go into the `psql` shell and confirm that a `pets` table has been created.
 
@@ -147,36 +149,7 @@ Just to confirm, let's go into the `psql` shell and confirm that a `pets` table 
 4. `\dt` - This will show the database tables
 
 
-#### Add a column to the Database:
-
-1. `sequelize migration:generate --name add-owner-to-pets`
-
-```js
-'use strict';
-
-module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.addColumn('Pets', 'owner', { type: Sequelize.STRING });
-  },
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.dropTable('users');
-    */
-  }
-};
-```
-
-1. `sequelize db:migrate`
-
-
-
-<br>
-
-## CFU
+## Quick Recap
 
 1. What files did `model:generate` create for us?
 2. How will our app use the model file?
@@ -185,7 +158,6 @@ module.exports = {
 5. What do the `up` and `down` methods in our migration file do?
 6. TRUE or FALSE: Generating a migration file automatically alters the schema of the database?
 	
-<br>
 
 ## Create database seeds for Pet
 
@@ -377,3 +349,39 @@ router.put('/:id', (req, res) => {
 ```
 
 ![](https://i.imgur.com/7k9A1we.png)
+
+#### Add a column to the Database:
+
+1. `sequelize migration:generate --name add-owner-to-pets`
+
+```js
+'use strict';
+
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.addColumn('Pets', 'owner', { type: Sequelize.STRING });
+  },
+  down: (queryInterface, Sequelize) => {
+    /*
+      Add reverting commands here.
+      Return a promise to correctly handle asynchronicity.
+
+      Example:
+      return queryInterface.dropTable('users');
+    */
+  }
+};
+```
+
+1. `sequelize db:migrate`
+
+
+## Undoing Migrations
+Now our table has been created and saved in database. With migration you can revert to old state by just running a command.
+
+You can use db:migrate:undo, this command will revert most recent migration.
+
+npx sequelize-cli db:migrate:undo
+You can revert back to initial state by undoing all migrations with db:migrate:undo:all command. You can also revert back to a specific migration by passing its name in --to option.
+
+npx sequelize-cli db:migrate:undo:all --to XXXXXXXXXXXXXX-create-posts.js
