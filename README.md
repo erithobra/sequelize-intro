@@ -20,7 +20,7 @@ For example, to find all the instances of a user in a database:
 
 ```js
 // SQL query 
-SELECT * FROM fruits;
+SELECT * FROM "Fruits";
 
 // Sequelize query
 Fruit.findAll()
@@ -213,13 +213,18 @@ Now we are going to update all our controller functions one by one.
 
 `controllers/fruits.js`:
 
-### Get All Fruits (index())
+### Get all Fruits (index())
 
 We will update our index funtion to query the database to get all fruits and just like earlier render `index.ejs` view to display all fruits.
 
 Previously,
 
 ```
+const index = (req, res) => {
+    res.render('index.ejs', {
+        fruits : fruits
+    });
+};
 ```
 
 Now,
@@ -260,72 +265,89 @@ But now we will send `fruit.id` as input in the URL so that id can be used to qu
 ```
 
 
-## Create a pet
+### Create a Fruit (postFruit())
 
+Previously,
 
-[Sequelize Docs](https://sequelize.org/master/manual/models-usage.html)
-
-`routes/pets.js`:
-
-```js
-/* CREATE a pet */
-router.post('/', (req, res) => {
-  Pet.create(req.body)
-    .then(pet => {
-      res.json({ pet })
-    })
-})
+```const postFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;     } else {         req.body.readyToEat = false;    }    fruits.push(req.body);        res.redirect('/fruits');}
 ```
 
-![](https://i.imgur.com/RN7tX30.png)
-
-<br>
-
-## Delete a pet
-
-[Sequelize Docs](https://sequelize.org/master/manual/querying.html#basics)
-
-`routes/pets.js`:
+Now,
 
 ```js
-/* DELETE a pet */
-router.delete('/:id', (req, res) => {
-  Pet.destroy({ where: { id: req.params.id } })
-    .then(() => {
-      return Pet.findAll()
-    })
-    .then(pets => {
-      res.json({ pets })
-    })
-})
+const postFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;     } else {         req.body.readyToEat = false;    }    Fruit.create(req.body)    .then(newFruit => {        res.redirect('/fruits');    })}
 ```
 
-![](https://i.imgur.com/ieR0mDy.png)
+### Delete a Fruit (deleteFruit())
 
-<br>
+Previously,
 
-## Update a pet
+```
+const deleteFruit = (req, res) => {    fruits.splice(req.params.index, 1);	res.redirect('/fruits');}
+```
 
-[Sequelize Docs](https://sequelize.org/master/manual/querying.html#basics)
-
-`routes/pets.js`:
+Now,
 
 ```js
-/* UPDATE a pet */
-router.put('/:id', (req, res) => {
-  console.log(req.body)
-  Pet.update({ name: req.body.name },
-    {
-      where: { id: req.params.id },
-      returning: true,
-    })
-    .then(pet => {
-      res.json(pet)
-    })
-})
+const deleteFruit = (req, res) => {    Fruit.destroy({ where: { id: req.params.index } })    .then(() => {        res.redirect('/fruits');    })	}
 ```
 
-![](https://i.imgur.com/7k9A1we.png)
+And just like earlier we will update delete link our `index.ejs` to send the fruit id and not index of an array.
+
+```
+...
+<form action="/fruits/<%=fruits[i].id%>?_method=DELETE" method="POST">    <input type="submit" value="DELETE"/></form>
+...
+``` 
+
+## Update a Fruit (renderEdit() & editFruit())
+
+To implement edit functionality we will update our function that renders the edit page and of course the function that updates data in the database.
+
+Lets start with `renderEdit()`
+
+Previously,
+
+```
+const renderEdit = (req, res) => {    res.render(		'edit.ejs',		{ 			fruit: fruits[req.params.index], 			index: req.params.index 		}	);}
+```
+
+Now,
+
+```
+const renderEdit = (req, res) => {    Fruit.findByPk(req.params.index)    .then(fruit => {        res.render('edit.ejs', {             fruit: fruit        });    })}
+```
+
+We will also update `edit.ejs` view to send `fruit.id` in url path as parameter instead of `index`.
+
+```
+...
+	<form action="/fruits/<%=fruit.id%>?_method=PUT" method="POST">
+...
+```
+
+Npw that we are sending the right fruit id we will update the `editFruit()` that updates the fruit in our database
+
+Previously,
+
+```
+const editFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;    } else {         req.body.readyToEat = false;    }	fruits[req.params.index] = req.body; 	res.redirect('/fruits'); }
+```
+
+Now, 
+
+```js
+const editFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;    } else {         req.body.readyToEat = false;    }    Fruit.update(req.body, {          where: { id: req.params.index },          returning: true,        }    )    .then(fruit => {        res.redirect('/fruits');    })}
+```
+Finally, we'll update the `index.js` to send `fruit.id` in url parameter.
+
+```
+...
+	<a href="/fruits/<%=fruits[i].id%>/edit">Edit</a>
+...
+```
+
+## Bonus
 
 #### Add a column to the Database:
 
