@@ -300,7 +300,7 @@ And just like earlier we will update delete link our `index.ejs` to send the fru
 ...
 ``` 
 
-## Update a Fruit (renderEdit() & editFruit())
+### Update a Fruit (renderEdit() & editFruit())
 
 To implement edit functionality we will update our function that renders the edit page and of course the function that updates data in the database.
 
