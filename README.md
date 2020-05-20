@@ -98,7 +98,7 @@ Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbin
 - Helps to set up associations between models
 - DRYs up our code. Importing this one file will give us access to all models.
 
-Let's use the Sequelize CLI `model:generate` command to create a Pet model with `name` and `owner` String attributes:
+Let's use the Sequelize CLI `model:generate` command to create a `Fruit` model with `name`, `color` and `readyToEat` attributes:
 
 
 `sequelize model:generate --name Fruit --attributes name:string,color:string,readyToEat:boolean`
@@ -145,7 +145,7 @@ Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]Loaded configuration fil
 ```
 
 
-Just to confirm, let's go into the `psql` shell and confirm that a `pets` table has been created.
+Just to confirm, let's go into the `psql` shell and confirm that a `Fruits` table has been created.
 
 1. `psql` - You can run this command from any directory to enter the Postgres shell
 2. `\l` - See the list of databases
