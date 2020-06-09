@@ -131,9 +131,13 @@ CREATE DATABASE
 
 #### Create a `Fruit` model
 
-Before we start with creating a fruit model, lets make one small change in our existing app. We will move `models\fruits.js` file from models folder to the parent folder, that is directly under `fruit-app`. And since we have changed the location of this file we will change the import in `controllers/fruits.js` to `const fruits = require('../fruits.js')`
+Before we start with creating a fruit model, lets make one small change in our existing app. We will move `models\fruits.js` and `models\users.js` files from models folder to the parent folder, that is directly under `fruit-app`. And since we have changed the location of this file we will change the import in,
 
-**Make sure you make the above change before moving forward**
+`controllers/fruits.js` to `const fruits = require('../fruits.js')`
+
+`controllers/users.js` to `const users = require('../users.js')`
+
+**Make sure you make the above changes before moving forward**
 
 Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbing in here! Mainly, this file...
 
@@ -192,10 +196,12 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },
       createdAt: {
+      	defaultValue: new Date(),
         allowNull: false,
         type: Sequelize.DATE
       },
       updatedAt: {
+      	defaultValue: new Date(),
         allowNull: false,
         type: Sequelize.DATE
       }
@@ -206,6 +212,7 @@ module.exports = {
   }
 };
 ```
+> Notice how we are defaulting the values of `createdAt` and `updatedAt` to current time.
 
 This file tells the database to create a `fruits` table. It also defines each column's name and Sequelize datatype.
 
