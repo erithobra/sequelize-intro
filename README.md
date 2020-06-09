@@ -281,23 +281,17 @@ module.exports = {
       {
           name:'apple',
           color: 'red',
-          readyToEat: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          readyToEat: true
       },
       {
           name:'pear',
           color: 'green',
-          readyToEat: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          readyToEat: false
       },
       {
           name:'banana',
           color: 'yellow',
-          readyToEat: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+          readyToEat: true
       }
     ], {});
   },
