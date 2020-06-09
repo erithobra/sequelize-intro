@@ -564,7 +564,7 @@ Finally, we'll update the `index.js` to send `fruit.id` in url parameter.
 ...
 ```
 
-## Bonus
+<!-- ## Bonus 
 
 #### Add a column to the Database:
 
@@ -600,4 +600,4 @@ You can use db:migrate:undo, this command will revert most recent migration.
 npx sequelize-cli db:migrate:undo
 You can revert back to initial state by undoing all migrations with db:migrate:undo:all command. You can also revert back to a specific migration by passing its name in --to option.
 
-npx sequelize-cli db:migrate:undo:all --to XXXXXXXXXXXXXX-create-posts.js
+npx sequelize-cli db:migrate:undo:all --to XXXXXXXXXXXXXX-create-posts.js -->
