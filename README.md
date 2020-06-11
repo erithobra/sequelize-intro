@@ -585,7 +585,8 @@ module.exports = {
         type: Sequelize.STRING
       },
       username: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
       password: {
         type: Sequelize.STRING
@@ -607,6 +608,8 @@ module.exports = {
   }
 };
 ```
+
+**Note:** We are making the `username` column **unique** and adding default value to `createdAt` and `updatedAt`.
 
 ### 2. Run Migrations
 
