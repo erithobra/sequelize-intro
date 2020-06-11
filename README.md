@@ -86,11 +86,13 @@ postgres=# CREATE DATABASE fruits_dev;
 CREATE DATABASE
 ```
 
-#### Create a `Fruit` model
+## Create Fruit model
 
 Before we start with creating a fruit model, lets make one small change in our existing app. We will move `models\fruits.js` file from models folder to the parent folder, that is directly under `fruit-app`. And since we have changed the location of this file we will change the import in `controllers/fruits.js` to `const fruits = require('../fruits.js')`
 
 **Make sure you make the above change before moving forward**
+
+### sequelize model:generate
 
 Sequelize CLI created a `models/index.js` file for us. There is a lot of plumbing in here! Mainly, this file...
 
@@ -118,7 +120,9 @@ This file describes what attributes and methods each instance of a `Fruit` shoul
 Migrations are how we manage the state of our database. Notice that each file is prefaced with a timestamp. You'll learn more about migrations tomorrow. Here's the file:
 
 ```js
-'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.createTable('Fruits', {      id: {        allowNull: false,        autoIncrement: true,        primaryKey: true,        type: Sequelize.INTEGER      },      name: {        type: Sequelize.STRING      },      color: {        type: Sequelize.STRING      },      readyToEat: {        type: Sequelize.BOOLEAN      },      createdAt: {        allowNull: false,        type: Sequelize.DATE      },      updatedAt: {        allowNull: false,        type: Sequelize.DATE      }    });  },  down: (queryInterface, Sequelize) => {    return queryInterface.dropTable('Fruits');  }};
+'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.createTable('Fruits', {      id: {        allowNull: false,        autoIncrement: true,        primaryKey: true,        type: Sequelize.INTEGER      },      name: {        type: Sequelize.STRING      },      color: {        type: Sequelize.STRING      },      readyToEat: {        type: Sequelize.BOOLEAN      },      createdAt: {        allowNull: false,
+        defaultValue: new Date(),        type: Sequelize.DATE      },      updatedAt: {        allowNull: false,
+        defaultValue: new Date(),        type: Sequelize.DATE      }    });  },  down: (queryInterface, Sequelize) => {    return queryInterface.dropTable('Fruits');  }};
 ```
 
 This file tells the database to create a `fruits` table. It also defines each column's name and Sequelize datatype.
@@ -126,7 +130,7 @@ This file tells the database to create a `fruits` table. It also defines each co
 A Migration in Sequelize is javascript file which exports two functions, `up` and `down`, that dictate how to perform the migration and undo it. You define those functions manually, but you don't call them manually; they will be called automatically by the CLI. In these functions, you should simply perform whatever queries you need, with the help of `sequelize.query` and whichever other methods Sequelize provides to you.
 
 
-#### Run the Migrations
+### sequelize db:migrate
 
 So far we've created a migration file, but our database has not recieved the instructions. We need to run our migrations folder to tell the database what we want it to look like. Let's run this command from the root directory of your app: 
 
@@ -151,19 +155,9 @@ Just to confirm, let's go into the `psql` shell and confirm that a `Fruits` tabl
 2. `\l` - See the list of databases
 3. `\c fruits_dev` - Connect to our database
 4. `\dt` - This will show the database tables
-
-
-## Quick Recap
-
-1. What files did `model:generate` create for us?
-2. How will our app use the model file?
-3. What are migrations used for?
-4. What are the 4 folders that the Sequelize CLI created for us?
-5. What do the `up` and `down` methods in our migration file do?
-6. TRUE or FALSE: Generating a migration file automatically alters the schema of the database?
 	
 
-## Create database seeds for Fruit
+### sequelize seed:generate
 
 The last folder that Seqelize created for us is a `seeders` folder. This is where we can add seeds for our database. Why might seeds be useful?
 
@@ -184,7 +178,7 @@ This created an empty seeders file. Fill it in like so:
 - We're also adding some `createdAt` and `updatedAt` fields since those are required.
 
 
-##### Seed your Database Table
+### sequelize db:seed:all
 
 Run `sequelize db:seed:all` to seed your `fruits` table.
 
@@ -193,13 +187,14 @@ Run `sequelize db:seed:all` to seed your `fruits` table.
 Run `SELECT * FROM "Fruits";`
 
 
-## Update Controller
+### Update Controller
 
 [Sequelize Queries](http://docs.sequelizejs.com/manual/tutorial/querying.html)
+
 [Sequelize Docs](https://sequelize.org/master/manual/models-usage.html)
 
 
-### Require the Fruit model in the fruits.js controller file
+#### Require the Fruit model in the fruits.js controller file
 
 First things first, we need to let our controller file `controllers/fruits.js` know about the `Fruit` model. We'll `require` the Sequelize `models/index.js` file. This file essentally `exports` an object that contains a property for each model.
 
@@ -213,7 +208,7 @@ Now we are going to update all our controller functions one by one.
 
 `controllers/fruits.js`:
 
-### Get all Fruits (index())
+#### Get all Fruits (index())
 
 We will update our index funtion to query the database to get all fruits and just like earlier render `index.ejs` view to display all fruits.
 
@@ -234,7 +229,7 @@ const index = (req, res) => {    Fruit.findAll()    .then(fruits => {        
 ```
 	
 
-### Get one Fruit (show())
+#### Get one Fruit (show())
 
 Previously,
 
@@ -265,7 +260,7 @@ But now we will send `fruit.id` as input in the URL so that id can be used to qu
 ```
 
 
-### Create a Fruit (postFruit())
+#### Create a Fruit (postFruit())
 
 Previously,
 
@@ -278,7 +273,7 @@ Now,
 const postFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;     } else {         req.body.readyToEat = false;    }    Fruit.create(req.body)    .then(newFruit => {        res.redirect('/fruits');    })}
 ```
 
-### Delete a Fruit (deleteFruit())
+#### Delete a Fruit (deleteFruit())
 
 Previously,
 
@@ -300,7 +295,7 @@ And just like earlier we will update delete link our `index.ejs` to send the fru
 ...
 ``` 
 
-### Update a Fruit (renderEdit() & editFruit())
+#### Update a Fruit (renderEdit() & editFruit())
 
 To implement edit functionality we will update our function that renders the edit page and of course the function that updates data in the database.
 
@@ -347,7 +342,99 @@ Finally, we'll update the `index.js` to send `fruit.id` in url parameter.
 ...
 ```
 
-## Bonus
+## Quick Recap
+
+1. What files did `model:generate` create for us?
+2. How will our app use the model file?
+3. What are migrations used for?
+4. What are the 4 folders that the Sequelize CLI created for us?
+5. What do the `up` and `down` methods in our migration file do?
+6. TRUE or FALSE: Generating a migration file automatically alters the schema of the database?
+
+## Create User Model
+
+### 1. Generate model
+
+Lets use the Sequelize CLI `model:generate` command again to create a `User` model with `name`, `username` and `password` attributes:
+
+`sequelize model:generate --name User --attributes name:string,username:string,password:string`
+
+Just like before two files will be created- `models/user.js` and `migrations/XXXXXXX-create-user.js`. Just like earlier we'll add default values to `createdAt` and `updatedAt`.
+
+```
+'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.createTable('Users', {      id: {        allowNull: false,        autoIncrement: true,        primaryKey: true,        type: Sequelize.INTEGER      },      name: {        type: Sequelize.STRING      },      username: {        type: Sequelize.STRING      },      password: {        type: Sequelize.STRING      },      createdAt: {        allowNull: false,        defaultValue: new Date(),        type: Sequelize.DATE      },      updatedAt: {        allowNull: false,        defaultValue: new Date(),        type: Sequelize.DATE      }    });  },  down: (queryInterface, Sequelize) => {    return queryInterface.dropTable('Users');  }};
+```
+
+### 2. Run Migrations
+
+Now, we'll run the migrations to create `User` table in our database.
+
+`sequelize db:migrate`
+
+Just to confirm, let's go into the `psql` shell and confirm that a `Users` table has been created.
+
+1. `psql` - You can run this command from any directory to enter the Postgres shell
+2. `\l` - See the list of databases
+3. `\c fruits_dev` - Connect to our database
+4. `\dt` - This will show the database tables 
+
+
+### 3. Add seed data in User
+
+`sequelize seed:generate --name demo-users`
+
+Fill the empty seeders file.
+
+```
+'use strict';
+
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.bulkInsert('Users', [
+      {        name:'Tony Stark',        username: 'ironman',        password: 'prettyawesome'      },      {        name:'Clark Kent',        username: 'superman',        password: `canfly`      },      {        name:'Bruce Wayne',        username: 'batman',        password: 'hasgadgets'      }
+    ], {});
+  },
+
+  down: (queryInterface, Sequelize) => {
+    /*
+      Add reverting commands here.
+      Return a promise to correctly handle asynchronicity.
+
+      Example:
+      return queryInterface.bulkDelete('People', null, {});
+    */
+  }
+};
+
+```
+
+### 4. Run Seed file
+
+Run `sequelize db:seed:all` to seed `Users` table.
+
+#### Running a seed file
+
+There are multiple ways of running a seed file
+
+**sequelize db:seed:all** will run all the seed files, even the ones that have been run before.
+
+**sequelize db:seed --seed XXXXXXXXX-demo-users.js** will run a specific seed file mentioned by name in the command
+
+Confirm in `psql` by running `SELECT * FROM "Users";`
+
+---------------------------
+
+## Independent Practice: Update User Controller
+Now that we have created our `User` model in the database. We will update the user controller such that all the functions use `User` model to do CRUD on user data.
+
+Just like earlier, don't forget to import `User` model in `controllers/users.js`.
+
+```
+const User = require('../models').User;
+```
+
+
+<!--## Bonus
 
 #### Add a column to the Database:
 
@@ -383,4 +470,4 @@ You can use db:migrate:undo, this command will revert most recent migration.
 npx sequelize-cli db:migrate:undo
 You can revert back to initial state by undoing all migrations with db:migrate:undo:all command. You can also revert back to a specific migration by passing its name in --to option.
 
-npx sequelize-cli db:migrate:undo:all --to XXXXXXXXXXXXXX-create-posts.js
+npx sequelize-cli db:migrate:undo:all --to XXXXXXXXXXXXXX-create-posts.js-->
