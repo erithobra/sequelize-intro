@@ -1,4 +1,3 @@
-
 ![](https://i.imgur.com/yvEYhnZ.png)
 
 
@@ -47,7 +46,34 @@ npm install pg --save
 After that run `sequelize`, if successfully installed you should see
 
 ```
-Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]sequelize [command]Commands:  sequelize db:migrate                        Run pending migrations  sequelize db:migrate:schema:timestamps:add  Update migration table to have timestamps  sequelize db:migrate:status                 List the status of all migrations  sequelize db:migrate:undo                   Reverts a migration  sequelize db:migrate:undo:all               Revert all migrations ran  sequelize db:seed                           Run specified seeder  sequelize db:seed:undo                      Deletes data from the database  sequelize db:seed:all                       Run every seeder  sequelize db:seed:undo:all                  Deletes data from the database  sequelize db:create                         Create database specified by configuration  sequelize db:drop                           Drop database specified by configuration  sequelize init                              Initializes project  sequelize init:config                       Initializes configuration  sequelize init:migrations                   Initializes migrations  sequelize init:models                       Initializes models  sequelize init:seeders                      Initializes seeders  sequelize migration:generate                Generates a new migration file                 [aliases: migration:create]  sequelize model:generate                    Generates a model and its migration                [aliases: model:create]  sequelize seed:generate                     Generates a new seed file                           [aliases: seed:create]Options:  --help     Show help                                                                                         [boolean]  --version  Show version number                                                                               [boolean]
+Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]
+
+sequelize [command]
+
+Commands:
+  sequelize db:migrate                        Run pending migrations
+  sequelize db:migrate:schema:timestamps:add  Update migration table to have timestamps
+  sequelize db:migrate:status                 List the status of all migrations
+  sequelize db:migrate:undo                   Reverts a migration
+  sequelize db:migrate:undo:all               Revert all migrations ran
+  sequelize db:seed                           Run specified seeder
+  sequelize db:seed:undo                      Deletes data from the database
+  sequelize db:seed:all                       Run every seeder
+  sequelize db:seed:undo:all                  Deletes data from the database
+  sequelize db:create                         Create database specified by configuration
+  sequelize db:drop                           Drop database specified by configuration
+  sequelize init                              Initializes project
+  sequelize init:config                       Initializes configuration
+  sequelize init:migrations                   Initializes migrations
+  sequelize init:models                       Initializes models
+  sequelize init:seeders                      Initializes seeders
+  sequelize migration:generate                Generates a new migration file                 [aliases: migration:create]
+  sequelize model:generate                    Generates a model and its migration                [aliases: model:create]
+  sequelize seed:generate                     Generates a new seed file                           [aliases: seed:create]
+
+Options:
+  --help     Show help                                                                                         [boolean]
+  --version  Show version number                                                                               [boolean]
 ```
 
 #### Sequelize Init in an App
@@ -68,7 +94,16 @@ Let's update the file to this:
 `config/config.json`
 
 ```js
-{  "development": {    "username": "postgres",    "password": "postgres",    "database": "fruits_dev",    "host": "127.0.0.1",    "dialect": "postgres",    "operatorsAliases": false  }}
+{
+  "development": {
+    "username": "postgres",
+    "password": "postgres",
+    "database": "fruits_dev",
+    "host": "127.0.0.1",
+    "dialect": "postgres",
+    "operatorsAliases": false
+  }
+}
 ```
 
 What did we change?
@@ -110,7 +145,18 @@ Let's use the Sequelize CLI `model:generate` command to create a `Fruit` model w
 Two files were created for us the first is the `models/fruit.js` model file.
 
 ```js
-'use strict';module.exports = (sequelize, DataTypes) => {  const Fruit = sequelize.define('Fruit', {    name: DataTypes.STRING,    color: DataTypes.STRING,    readyToEat: DataTypes.BOOLEAN  }, {});  Fruit.associate = function(models) {    // associations can be defined here  };  return Fruit;};
+'use strict';
+module.exports = (sequelize, DataTypes) => {
+  const Fruit = sequelize.define('Fruit', {
+    name: DataTypes.STRING,
+    color: DataTypes.STRING,
+    readyToEat: DataTypes.BOOLEAN
+  }, {});
+  Fruit.associate = function(models) {
+    // associations can be defined here
+  };
+  return Fruit;
+};
 ```
 
 This file describes what attributes and methods each instance of a `Fruit` should have in our database. How are attributes stored in our database?
@@ -120,9 +166,41 @@ This file describes what attributes and methods each instance of a `Fruit` shoul
 Migrations are how we manage the state of our database. Notice that each file is prefaced with a timestamp. You'll learn more about migrations tomorrow. Here's the file:
 
 ```js
-'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.createTable('Fruits', {      id: {        allowNull: false,        autoIncrement: true,        primaryKey: true,        type: Sequelize.INTEGER      },      name: {        type: Sequelize.STRING      },      color: {        type: Sequelize.STRING      },      readyToEat: {        type: Sequelize.BOOLEAN      },      createdAt: {        allowNull: false,
-        defaultValue: new Date(),        type: Sequelize.DATE      },      updatedAt: {        allowNull: false,
-        defaultValue: new Date(),        type: Sequelize.DATE      }    });  },  down: (queryInterface, Sequelize) => {    return queryInterface.dropTable('Fruits');  }};
+'use strict';
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('Fruits', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      name: {
+        type: Sequelize.STRING
+      },
+      color: {
+        type: Sequelize.STRING
+      },
+      readyToEat: {
+        type: Sequelize.BOOLEAN
+      },
+      createdAt: {
+        allowNull: false,
+        defaultValue: new Date(),
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        defaultValue: new Date(),
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('Fruits');
+  }
+};
 ```
 
 This file tells the database to create a `fruits` table. It also defines each column's name and Sequelize datatype.
@@ -145,7 +223,13 @@ This command will execute these steps:
 This is what you'll see on cmd prompt after running the above command,
 
 ```
-Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]Loaded configuration file "config\config.json".Using environment "development".(node:11100) [SEQUELIZE0004] DeprecationWarning: A boolean value was passed to options.operatorsAliases. This is a no-op with v5 and should be removed.== 20200518203858-create-fruit: migrating ========= 20200518203858-create-fruit: migrated (0.058s)
+Sequelize CLI [Node: 12.16.3, CLI: 5.5.1, ORM: 5.21.9]
+
+Loaded configuration file "config\config.json".
+Using environment "development".
+(node:11100) [SEQUELIZE0004] DeprecationWarning: A boolean value was passed to options.operatorsAliases. This is a no-op with v5 and should be removed.
+== 20200518203858-create-fruit: migrating =======
+== 20200518203858-create-fruit: migrated (0.058s)
 ```
 
 
@@ -168,7 +252,45 @@ Let's have the Sequelize CLI scaffold a timestamped file for `Fruit` seeds in th
 This created an empty seeders file. Fill it in like so:
 
 ```js
-'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.bulkInsert('Fruits', [      {          name:'apple',          color: 'red',          readyToEat: true,          createdAt: new Date(),          updatedAt: new Date()      },      {          name:'pear',          color: 'green',          readyToEat: false,          createdAt: new Date(),          updatedAt: new Date()      },      {          name:'banana',          color: 'yellow',          readyToEat: true,          createdAt: new Date(),          updatedAt: new Date()      }    ], {});  },  down: (queryInterface, Sequelize) => {    /*      Add reverting commands here.      Return a promise to correctly handle asynchronicity.      Example:      return queryInterface.bulkDelete('Fruits', null, {});    */  }};
+'use strict';
+
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.bulkInsert('Fruits', [
+      {
+          name:'apple',
+          color: 'red',
+          readyToEat: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+      },
+      {
+          name:'pear',
+          color: 'green',
+          readyToEat: false,
+          createdAt: new Date(),
+          updatedAt: new Date()
+      },
+      {
+          name:'banana',
+          color: 'yellow',
+          readyToEat: true,
+          createdAt: new Date(),
+          updatedAt: new Date()
+      }
+    ], {});
+  },
+
+  down: (queryInterface, Sequelize) => {
+    /*
+      Add reverting commands here.
+      Return a promise to correctly handle asynchronicity.
+
+      Example:
+      return queryInterface.bulkDelete('Fruits', null, {});
+    */
+  }
+};
 ```
 
 #### What's going on here!?
@@ -225,7 +347,15 @@ const index = (req, res) => {
 Now,
 
 ```js
-const index = (req, res) => {    Fruit.findAll()    .then(fruits => {        res.render('index.ejs', {            fruits : fruits        });    })    };
+const index = (req, res) => {
+    Fruit.findAll()
+    .then(fruits => {
+        res.render('index.ejs', {
+            fruits : fruits
+        });
+    })
+    
+};
 ```
 	
 
@@ -234,13 +364,24 @@ const index = (req, res) => {    Fruit.findAll()    .then(fruits => {        
 Previously,
 
 ```
-const show = (req, res) => {    res.render('show.ejs', {        fruit: fruits[req.params.index]    });}
+const show = (req, res) => {
+    res.render('show.ejs', {
+        fruit: fruits[req.params.index]
+    });
+}
 ```
 
 Now,
 
 ```js
-const show = (req, res) => {    Fruit.findByPk(req.params.index)    .then(fruit => {        res.render('show.ejs', {            fruit: fruit        });    })}
+const show = (req, res) => {
+    Fruit.findByPk(req.params.index)
+    .then(fruit => {
+        res.render('show.ejs', {
+            fruit: fruit
+        });
+    })
+}
 ```
 
 To have the link work we will have to make one more change in `views/index.ejs`. Currently the input sent in url is the index of the fruit since earlier `fruits` was an array. Like this,
@@ -264,13 +405,34 @@ But now we will send `fruit.id` as input in the URL so that id can be used to qu
 
 Previously,
 
-```const postFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;     } else {         req.body.readyToEat = false;    }    fruits.push(req.body);        res.redirect('/fruits');}
+```
+const postFruit = (req, res) => {
+    if(req.body.readyToEat === 'on'){ 
+        req.body.readyToEat = true; 
+    } else { 
+        req.body.readyToEat = false;
+    }
+    fruits.push(req.body);
+    
+    res.redirect('/fruits');
+}
 ```
 
 Now,
 
 ```js
-const postFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;     } else {         req.body.readyToEat = false;    }    Fruit.create(req.body)    .then(newFruit => {        res.redirect('/fruits');    })}
+const postFruit = (req, res) => {
+    if(req.body.readyToEat === 'on'){ 
+        req.body.readyToEat = true; 
+    } else { 
+        req.body.readyToEat = false;
+    }
+
+    Fruit.create(req.body)
+    .then(newFruit => {
+        res.redirect('/fruits');
+    })
+}
 ```
 
 #### Delete a Fruit (deleteFruit())
@@ -278,20 +440,30 @@ const postFruit = (req, res) => {    if(req.body.readyToEat === 'on'){        
 Previously,
 
 ```
-const deleteFruit = (req, res) => {    fruits.splice(req.params.index, 1);	res.redirect('/fruits');}
+const deleteFruit = (req, res) => {
+    fruits.splice(req.params.index, 1);
+	res.redirect('/fruits');
+}
 ```
 
 Now,
 
 ```js
-const deleteFruit = (req, res) => {    Fruit.destroy({ where: { id: req.params.index } })    .then(() => {        res.redirect('/fruits');    })	}
+const deleteFruit = (req, res) => {
+    Fruit.destroy({ where: { id: req.params.index } })
+    .then(() => {
+        res.redirect('/fruits');
+    })	
+}
 ```
 
 And just like earlier we will update delete link our `index.ejs` to send the fruit id and not index of an array.
 
 ```
 ...
-<form action="/fruits/<%=fruits[i].id%>?_method=DELETE" method="POST">    <input type="submit" value="DELETE"/></form>
+<form action="/fruits/<%=fruits[i].id%>?_method=DELETE" method="POST">
+    <input type="submit" value="DELETE"/>
+</form>
 ...
 ``` 
 
@@ -304,13 +476,28 @@ Lets start with `renderEdit()`
 Previously,
 
 ```
-const renderEdit = (req, res) => {    res.render(		'edit.ejs',		{ 			fruit: fruits[req.params.index], 			index: req.params.index 		}	);}
+const renderEdit = (req, res) => {
+    res.render(
+		'edit.ejs',
+		{ 
+			fruit: fruits[req.params.index], 
+			index: req.params.index 
+		}
+	);
+}
 ```
 
 Now,
 
 ```
-const renderEdit = (req, res) => {    Fruit.findByPk(req.params.index)    .then(fruit => {        res.render('edit.ejs', {             fruit: fruit        });    })}
+const renderEdit = (req, res) => {
+    Fruit.findByPk(req.params.index)
+    .then(fruit => {
+        res.render('edit.ejs', { 
+            fruit: fruit
+        });
+    })
+}
 ```
 
 We will also update `edit.ejs` view to send `fruit.id` in url path as parameter instead of `index`.
@@ -326,13 +513,35 @@ Npw that we are sending the right fruit id we will update the `editFruit()` that
 Previously,
 
 ```
-const editFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;    } else {         req.body.readyToEat = false;    }	fruits[req.params.index] = req.body; 	res.redirect('/fruits'); }
+const editFruit = (req, res) => {
+    if(req.body.readyToEat === 'on'){ 
+        req.body.readyToEat = true;
+    } else { 
+        req.body.readyToEat = false;
+    }
+	fruits[req.params.index] = req.body; 
+	res.redirect('/fruits'); 
+}
 ```
 
 Now, 
 
 ```js
-const editFruit = (req, res) => {    if(req.body.readyToEat === 'on'){         req.body.readyToEat = true;    } else {         req.body.readyToEat = false;    }    Fruit.update(req.body, {          where: { id: req.params.index },          returning: true,        }    )    .then(fruit => {        res.redirect('/fruits');    })}
+const editFruit = (req, res) => {
+    if(req.body.readyToEat === 'on'){ 
+        req.body.readyToEat = true;
+    } else { 
+        req.body.readyToEat = false;
+    }
+    Fruit.update(req.body, {
+          where: { id: req.params.index },
+          returning: true,
+        }
+    )
+    .then(fruit => {
+        res.redirect('/fruits');
+    })
+}
 ```
 Finally, we'll update the `index.js` to send `fruit.id` in url parameter.
 
@@ -362,7 +571,41 @@ Lets use the Sequelize CLI `model:generate` command again to create a `User` mod
 Just like before two files will be created- `models/user.js` and `migrations/XXXXXXX-create-user.js`. Just like earlier we'll add default values to `createdAt` and `updatedAt`.
 
 ```
-'use strict';module.exports = {  up: (queryInterface, Sequelize) => {    return queryInterface.createTable('Users', {      id: {        allowNull: false,        autoIncrement: true,        primaryKey: true,        type: Sequelize.INTEGER      },      name: {        type: Sequelize.STRING      },      username: {        type: Sequelize.STRING      },      password: {        type: Sequelize.STRING      },      createdAt: {        allowNull: false,        defaultValue: new Date(),        type: Sequelize.DATE      },      updatedAt: {        allowNull: false,        defaultValue: new Date(),        type: Sequelize.DATE      }    });  },  down: (queryInterface, Sequelize) => {    return queryInterface.dropTable('Users');  }};
+'use strict';
+module.exports = {
+  up: (queryInterface, Sequelize) => {
+    return queryInterface.createTable('Users', {
+      id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: Sequelize.INTEGER
+      },
+      name: {
+        type: Sequelize.STRING
+      },
+      username: {
+        type: Sequelize.STRING
+      },
+      password: {
+        type: Sequelize.STRING
+      },
+      createdAt: {
+        allowNull: false,
+        defaultValue: new Date(),
+        type: Sequelize.DATE
+      },
+      updatedAt: {
+        allowNull: false,
+        defaultValue: new Date(),
+        type: Sequelize.DATE
+      }
+    });
+  },
+  down: (queryInterface, Sequelize) => {
+    return queryInterface.dropTable('Users');
+  }
+};
 ```
 
 ### 2. Run Migrations
@@ -373,9 +616,6 @@ Now, we'll run the migrations to create `User` table in our database.
 
 Just to confirm, let's go into the `psql` shell and confirm that a `Users` table has been created.
 
-1. `psql` - You can run this command from any directory to enter the Postgres shell
-2. `\l` - See the list of databases
-3. `\c fruits_dev` - Connect to our database
 4. `\dt` - This will show the database tables 
 
 
@@ -391,7 +631,21 @@ Fill the empty seeders file.
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.bulkInsert('Users', [
-      {        name:'Tony Stark',        username: 'ironman',        password: 'prettyawesome'      },      {        name:'Clark Kent',        username: 'superman',        password: `canfly`      },      {        name:'Bruce Wayne',        username: 'batman',        password: 'hasgadgets'      }
+      {
+        name:'Tony Stark',
+        username: 'ironman',
+        password: 'prettyawesome'
+      },
+      {
+        name:'Clark Kent',
+        username: 'superman',
+        password: `canfly`
+      },
+      {
+        name:'Bruce Wayne',
+        username: 'batman',
+        password: 'hasgadgets'
+      }
     ], {});
   },
 
