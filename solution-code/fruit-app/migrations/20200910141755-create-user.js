@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {//performing migrations
-    return queryInterface.createTable('Fruits', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,11 +11,14 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
-      color: {
-        type: Sequelize.STRING
+      username: {
+        type: Sequelize.STRING,
+        unique: true,
+        allowNull: false,
       },
-      readyToEat: {
-        type: Sequelize.BOOLEAN
+      password: {
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -29,7 +32,7 @@ module.exports = {
       }
     });
   },
-  down: (queryInterface, Sequelize) => {//undo migrations
-    return queryInterface.dropTable('Fruits');
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Users');
   }
 };

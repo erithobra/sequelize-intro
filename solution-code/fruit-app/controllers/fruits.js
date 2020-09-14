@@ -1,32 +1,22 @@
-const fruits = require('../fruits');//imported fruits array
-
-const Fruit = require('../models').Fruit; // import Fruit model
+const Fruit = require('../models').Fruit;//imported fruits array
 
 //handle index request
 const index = (req, res) => {
-    Fruit.findAll()//return a promise object
-    .then(allFruits => { //if success store fruits in fruits variable
-        res.render('index.ejs', {//render template
-            fruits: allFruits//pass along all the fruits in the Fruits table
+    Fruit.findAll()
+    .then(fruits => {
+        res.render('index.ejs', {
+            fruits : fruits
         });
     })
-    // res.render('index.ejs', {
-    //     fruits: fruits
-    // });
 }
 
 const show = (req, res) => {
     Fruit.findByPk(req.params.index)
-    .then(foundFruit => {
+    .then(fruit => {
         res.render('show.ejs', {
-            fruit: foundFruit
+            fruit: fruit
         });
     })
-
-    // let f = fruits[req.params.index];
-    // res.render('show.ejs', { //second param must be an object
-    //     fruit: f
-    // });
 }
 
 const renderNew = (req, res) => {
@@ -34,9 +24,9 @@ const renderNew = (req, res) => {
 }
 
 const postFruit = (req, res) => {
-    if(req.body.readyToEat === 'on'){
-        req.body.readyToEat = true;
-    } else{
+    if(req.body.readyToEat === 'on'){ 
+        req.body.readyToEat = true; 
+    } else { 
         req.body.readyToEat = false;
     }
 
@@ -44,56 +34,38 @@ const postFruit = (req, res) => {
     .then(newFruit => {
         res.redirect('/fruits');
     })
-
-    //saving fruit object in fruits array
-    // fruits.push(req.body);
-
-    // console.log(fruits);
-    // res.redirect('/fruits');
 }
 
 const removeFruit = (req, res) => {
-    Fruit.destroy({
-        where: {id: req.params.index}
-    })
+    Fruit.destroy({ where: { id: req.params.index } })
     .then(() => {
-        res.redirect('/fruits')
-    })
-
-    // fruits.splice(req.params.index, 1);
-    // res.redirect('/fruits');
+        res.redirect('/fruits');
+    })	
 }
 
 const renderEdit = (req, res) => {
     Fruit.findByPk(req.params.index)
-    .then(foundFruit => {
-        res.render('edit.ejs', {
-            fruit: foundFruit
-        })
+    .then(fruit => {
+        res.render('edit.ejs', { 
+            fruit: fruit
+        });
     })
-    // res.render('edit.ejs', {
-    //     fruit: fruits[req.params.index],
-    //     index: req.params.index
-    // })
 }
 
 const editFruit = (req, res) => {
-    if(req.body.readyToEat === 'on'){
+    if(req.body.readyToEat === 'on'){ 
         req.body.readyToEat = true;
-    } else{
+    } else { 
         req.body.readyToEat = false;
     }
-
     Fruit.update(req.body, {
-        where: {id: req.params.index},
-        returning: true//update to send back the updated Fruit object
-    })
-    .then(updatedFruit => {
+          where: { id: req.params.index },
+          returning: true,
+        }
+    )
+    .then(fruit => {
         res.redirect('/fruits');
     })
-
-    // fruits[req.params.index] = req.body;
-    // res.redirect('/fruits');
 }
 
 module.exports = {

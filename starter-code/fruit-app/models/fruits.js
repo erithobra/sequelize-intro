@@ -14,6 +14,6 @@ const fruits = [
         color: 'yellow',
         readyToEat: true
     }
-];   
+];
 
 module.exports = fruits;

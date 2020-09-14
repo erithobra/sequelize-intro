@@ -1,14 +1,16 @@
-const fruits = require('../models/fruits.js')
+const fruits = require('../models/fruits');//imported fruits array
 
+//handle index request
 const index = (req, res) => {
     res.render('index.ejs', {
-        fruits : fruits
+        fruits: fruits
     });
-};
+}
 
 const show = (req, res) => {
-    res.render('show.ejs', {
-        fruit: fruits[req.params.index]
+    let f = fruits[req.params.index];
+    res.render('show.ejs', { //second param must be an object
+        fruit: f
     });
 }
 
@@ -17,47 +19,48 @@ const renderNew = (req, res) => {
 }
 
 const postFruit = (req, res) => {
-    if(req.body.readyToEat === 'on'){ //if checked, req.body.readyToEat is set to 'on'
-        req.body.readyToEat = true; //do some data correction
-    } else { //if not checked, req.body.readyToEat is undefined
-        req.body.readyToEat = false; //do some data correction
+    if(req.body.readyToEat === 'on'){
+        req.body.readyToEat = true;
+    } else{
+        req.body.readyToEat = false;
     }
+
+    //saving fruit object in fruits array
     fruits.push(req.body);
-    
+
+    console.log(fruits);
+    res.redirect('/fruits');
+}
+
+const removeFruit = (req, res) => {
+    fruits.splice(req.params.index, 1);
     res.redirect('/fruits');
 }
 
 const renderEdit = (req, res) => {
-    res.render(
-		'edit.ejs', //render views/edit.ejs
-		{ //pass in an object that contains
-			fruit: fruits[req.params.index], //the fruit object
-			index: req.params.index //... and its index in the array
-		}
-	);
+    res.render('edit.ejs', {
+        fruit: fruits[req.params.index],
+        index: req.params.index
+    })
 }
 
 const editFruit = (req, res) => {
-    if(req.body.readyToEat === 'on'){ //if checked, req.body.readyToEat is set to 'on'
+    if(req.body.readyToEat === 'on'){
         req.body.readyToEat = true;
-    } else { //if not checked, req.body.readyToEat is undefined
+    } else{
         req.body.readyToEat = false;
     }
-	fruits[req.params.index] = req.body; //in our fruits array, find the index that is specified in the url (:index).  Set that element to the value of req.body (the input data)
-	res.redirect('/fruits'); //redirect to the index page
+
+    fruits[req.params.index] = req.body;
+    res.redirect('/fruits');
 }
 
-const deleteFruit = (req, res) => {
-    fruits.splice(req.params.index, 1); //remove the item from the array
-	res.redirect('/fruits');  //redirect back to index route
-}
-  
 module.exports = {
     index,
+    show,
     renderNew,
     postFruit,
-    show,
+    removeFruit,
     renderEdit,
-    editFruit,
-    deleteFruit
-  };
+    editFruit
+}

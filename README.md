@@ -40,7 +40,7 @@ Run this from your cmd prompt:
 ```
 npm install -g sequelize-cli
 npm install sequelize
-npm install pg --save
+npm install pg
 ```
 
 After that run `sequelize`, if successfully installed you should see
@@ -96,8 +96,6 @@ Let's update the file to this:
 ```js
 {
   "development": {
-    "username": "postgres",
-    "password": "postgres",
     "database": "fruits_dev",
     "host": "127.0.0.1",
     "dialect": "postgres",
@@ -105,6 +103,9 @@ Let's update the file to this:
   }
 }
 ```
+> Depending upon how you have installed postgres you may have to give `username` and `password` like this `"username": "postgres",
+    "password": "postgres",` along with other config details. Be sure to remember the credentials to connect to Postgres.
+
 
 What did we change?
 
@@ -120,6 +121,10 @@ psql -U postgres
 postgres=# CREATE DATABASE fruits_dev;
 CREATE DATABASE
 ```
+
+OR
+
+run `createdb fruits_dev` on the terminal
 
 ## Create Fruit model
 
@@ -146,15 +151,26 @@ Two files were created for us the first is the `models/fruit.js` model file.
 
 ```js
 'use strict';
+const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  const Fruit = sequelize.define('Fruit', {
+  class Fruit extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  };
+  Fruit.init({
     name: DataTypes.STRING,
     color: DataTypes.STRING,
     readyToEat: DataTypes.BOOLEAN
-  }, {});
-  Fruit.associate = function(models) {
-    // associations can be defined here
-  };
+  }, {
+    sequelize,
+    modelName: 'Fruit',
+  });
   return Fruit;
 };
 ```
@@ -388,7 +404,7 @@ To have the link work we will have to make one more change in `views/index.ejs`.
 
 ```
 ...
-	The <a href="/fruits/<%=i%>"><%=fruits[i].name; %></a> is  <%=fruits[i].color; %>.
+	<a href="/fruits/<%=i%>"><%=fruits[i].name%></a>
 ...
 ```
 
@@ -396,7 +412,7 @@ But now we will send `fruit.id` as input in the URL so that id can be used to qu
 
 ```
 ...
-	The <a href="/fruits/<%=fruits[i].id%>"><%=fruits[i].name; %></a> is  <%=fruits[i].color; %>.
+	<a href="/fruits/<%=fruits[i].id%>"><%=fruits[i].name%></a>
 ...
 ```
 
@@ -440,7 +456,7 @@ const postFruit = (req, res) => {
 Previously,
 
 ```
-const deleteFruit = (req, res) => {
+const removeFruit = (req, res) => {
     fruits.splice(req.params.index, 1);
 	res.redirect('/fruits');
 }
@@ -449,7 +465,7 @@ const deleteFruit = (req, res) => {
 Now,
 
 ```js
-const deleteFruit = (req, res) => {
+const removeFruit = (req, res) => {
     Fruit.destroy({ where: { id: req.params.index } })
     .then(() => {
         res.redirect('/fruits');
@@ -543,7 +559,7 @@ const editFruit = (req, res) => {
     })
 }
 ```
-Finally, we'll update the `index.js` to send `fruit.id` in url parameter.
+Finally, we'll update the `index.js` to send `fruits[i].id` in url parameter.
 
 ```
 ...
@@ -568,7 +584,37 @@ Lets use the Sequelize CLI `model:generate` command again to create a `User` mod
 
 `sequelize model:generate --name User --attributes name:string,username:string,password:string`
 
-Just like before two files will be created- `models/user.js` and `migrations/XXXXXXX-create-user.js`. Just like earlier we'll add default values to `createdAt` and `updatedAt`.
+Just like before two files will be created- `models/user.js` and `migrations/XXXXXXX-create-user.js`. 
+
+```
+'use strict';
+const {
+  Model
+} = require('sequelize');
+module.exports = (sequelize, DataTypes) => {
+  class User extends Model {
+    /**
+     * Helper method for defining associations.
+     * This method is not a part of Sequelize lifecycle.
+     * The `models/index` file will call this method automatically.
+     */
+    static associate(models) {
+      // define association here
+    }
+  };
+  User.init({
+    name: DataTypes.STRING,
+    username: DataTypes.STRING,
+    password: DataTypes.STRING
+  }, {
+    sequelize,
+    modelName: 'User',
+  });
+  return User;
+};
+```
+
+Just like earlier we'll add default values to `createdAt` and `updatedAt`.
 
 ```
 'use strict';
@@ -586,10 +632,12 @@ module.exports = {
       },
       username: {
         type: Sequelize.STRING,
-        unique: true
+        unique: true,
+        allowNull: false,
       },
       password: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        allowNull: false,
       },
       createdAt: {
         allowNull: false,
@@ -609,7 +657,7 @@ module.exports = {
 };
 ```
 
-**Note:** We are making the `username` column **unique** and adding default value to `createdAt` and `updatedAt`.
+**Note:** We are making the `username` column **unique & not null**, making `password` column **not null** and adding default value to `createdAt` and `updatedAt`.
 
 ### 2. Run Migrations
 
@@ -667,10 +715,6 @@ module.exports = {
 
 ### 4. Run Seed file
 
-Run `sequelize db:seed:all` to seed `Users` table.
-
-#### Running a seed file
-
 There are multiple ways of running a seed file
 
 **sequelize db:seed:all** will run all the seed files, even the ones that have been run before.
@@ -690,6 +734,7 @@ Just like earlier, don't forget to import `User` model in `controllers/users.js`
 const User = require('../models').User;
 ```
 
+Feel free to refer to the solution code provided [here](./solution-code). 
 
 <!--## Bonus
 

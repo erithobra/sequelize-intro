@@ -1,16 +1,22 @@
+//imported express library
 const express = require('express');
-const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
 
-const app = express();//app is an object
+const app = express();//returns an object
 const routes = require('./routes');
 
-app.use(bodyParser.urlencoded({extended:false}));
+//middleware- every request goes through it
+app.use(express.static("public"));
+
+app.use(express.urlencoded({ extended: true }));
 
 app.use(methodOverride('_method'));
 
-app.use('/fruits', routes.fruits)
+//adding router object to middleware
+app.use('/fruits', routes.fruits);
+app.use('/users', routes.users);
 
-app.listen(3000, ()=>{
-    console.log("listening");
-});
+//app will run on port 3000
+app.listen(3000, () => {
+    console.log('I am listening on port 3000');
+})
