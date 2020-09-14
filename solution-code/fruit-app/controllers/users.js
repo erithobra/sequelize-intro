@@ -1,7 +1,7 @@
-const users = require('../models').User;
+const User = require('../models').User;
 
 const index = (req, res) => {
-    res.render('users/index.ejs')//views/users/index.ejs
+    res.render('users/index.ejs')
 }
 
 const renderSignup = (req, res) => {
@@ -9,8 +9,10 @@ const renderSignup = (req, res) => {
 }
 
 const signup = (req, res) => {
-    users.push(req.body);
-    res.redirect(`/users/profile/${users.length-1}`);
+    User.create(req.body)
+    .then(newUser => {
+        res.redirect(`/users/profile/${newUser.id}`);
+    })
 }
 
 const renderLogin = (req, res) => {
@@ -18,38 +20,56 @@ const renderLogin = (req, res) => {
 }
 
 const login = (req, res) => {
-    let index = users.findIndex(
-        user => (user.username === req.body.username && 
-                    user.password === req.body.password)
-    )
-
-    res.redirect(`/users/profile/${index}`);
+    User.findOne({
+        where: {
+            username: req.body.username,
+            password: req.body.password
+        }
+    })
+    .then(foundUser => {
+        res.redirect(`/users/profile/${foundUser.id}`);
+    })
 }
 
 const renderProfile = (req, res) => {
-    res.render('users/profile.ejs', {
-        user: users[req.params.index],
-        index: req.params.index
+    User.findByPk(req.params.index)
+    .then(userProfile => {
+        res.render('users/profile.ejs', {
+            user: userProfile
+        })
     })
 }
 
 const editProfile = (req, res) => {
-    users[req.params.index] = req.body;
-    res.redirect(`/users/profile/${req.params.index}`);
+    User.update(req.body, {
+        where: {
+            id: req.params.index
+        },
+        returning: true
+    })
+    .then(updatedUser => {
+        res.redirect(`/users/profile/${req.params.index}`);
+    })
 }
 
 const deleteUser = (req, res) => {
-    users.splice(req.params.index, 1);
-    res.redirect('/users');
+    User.destroy({
+        where: {
+            id: req.params.index
+        }
+    })
+    .then(() => {
+        res.redirect('/users');
+    })
 }
 
 module.exports = {
     index,
     renderSignup,
-    signup,
-    renderProfile,
     renderLogin,
+    signup,
     login,
+    renderProfile,
     editProfile,
     deleteUser
 }

@@ -726,6 +726,7 @@ Confirm in `psql` by running `SELECT * FROM "Users";`
 ---------------------------
 
 ## Independent Practice: Update User Controller
+
 Now that we have created our `User` model in the database. We will update the user controller such that all the functions use `User` model to do CRUD on user data.
 
 Just like earlier, don't forget to import `User` model in `controllers/users.js`.
@@ -733,6 +734,8 @@ Just like earlier, don't forget to import `User` model in `controllers/users.js`
 ```
 const User = require('../models').User;
 ```
+
+Don't forget to update `users/profile.ejs` with user's id.
 
 Feel free to refer to the solution code provided [here](./solution-code). 
 
