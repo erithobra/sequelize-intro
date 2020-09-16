@@ -184,8 +184,8 @@ Migrations are how we manage the state of our database. Notice that each file is
 ```js
 'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Fruits', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Fruits', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -271,28 +271,25 @@ This created an empty seeders file. Fill it in like so:
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('Fruits', [
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.bulkInsert('Fruits', [
       {
-          name:'apple',
-          color: 'red',
-          readyToEat: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+        name:'apple',
+        color: 'red',
+        readyToEat: true,
+        userId: 1,
       },
       {
-          name:'pear',
-          color: 'green',
-          readyToEat: false,
-          createdAt: new Date(),
-          updatedAt: new Date()
+        name:'pear',
+        color: 'green',
+        readyToEat: false,
+        userId: 2,
       },
       {
-          name:'banana',
-          color: 'yellow',
-          readyToEat: true,
-          createdAt: new Date(),
-          updatedAt: new Date()
+        name:'banana',
+        color: 'yellow',
+        readyToEat: true,
+        userId: 3,
       }
     ], {});
   },
@@ -619,8 +616,8 @@ Just like earlier we'll add default values to `createdAt` and `updatedAt`.
 ```
 'use strict';
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Users', {
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -680,24 +677,28 @@ Fill the empty seeders file.
 'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
-    return queryInterface.bulkInsert('Users', [
-      {
-        name:'Tony Stark',
-        username: 'ironman',
-        password: 'prettyawesome'
-      },
-      {
-        name:'Clark Kent',
-        username: 'superman',
-        password: `canfly`
-      },
-      {
-        name:'Bruce Wayne',
-        username: 'batman',
-        password: 'hasgadgets'
-      }
-    ], {});
+  up: async (queryInterface, Sequelize) => {
+    await queryInterface.bulkInsert(
+      "Users",
+      [
+        {
+          name: "Tony Stark",
+          username: "ironman",
+          password: "prettyawesome",
+        },
+        {
+          name: "Clark Kent",
+          username: "superman",
+          password: "canfly",
+        },
+        {
+          name: "Bruce Wayne",
+          username: "batman",
+          password: "hasgadgets",
+        },
+      ],
+      {}
+    );
   },
 
   down: (queryInterface, Sequelize) => {
