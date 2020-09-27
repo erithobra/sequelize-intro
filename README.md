@@ -213,8 +213,8 @@ module.exports = {
       }
     });
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Fruits');
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Fruits');
   }
 };
 ```
@@ -276,32 +276,28 @@ module.exports = {
       {
         name:'apple',
         color: 'red',
-        readyToEat: true,
-        userId: 1,
+        readyToEat: true
       },
       {
         name:'pear',
         color: 'green',
-        readyToEat: false,
-        userId: 2,
+        readyToEat: false
       },
       {
         name:'banana',
         color: 'yellow',
-        readyToEat: true,
-        userId: 3,
+        readyToEat: true
       }
     ], {});
   },
 
-  down: (queryInterface, Sequelize) => {
-    /*
-      Add reverting commands here.
-      Return a promise to correctly handle asynchronicity.
-
-      Example:
-      return queryInterface.bulkDelete('Fruits', null, {});
-    */
+  down: async (queryInterface, Sequelize) => {
+    /**
+     * Add commands to revert seed here.
+     *
+     * Example:
+     * await queryInterface.bulkDelete('People', null, {});
+     */
   }
 };
 ```
@@ -648,8 +644,8 @@ module.exports = {
       }
     });
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+  down: async (queryInterface, Sequelize) => {
+    await queryInterface.dropTable('Users');
   }
 };
 ```
@@ -707,7 +703,7 @@ module.exports = {
       Return a promise to correctly handle asynchronicity.
 
       Example:
-      return queryInterface.bulkDelete('People', null, {});
+      await queryInterface.bulkDelete('People', null, {});
     */
   }
 };
