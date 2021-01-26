@@ -573,6 +573,8 @@ Finally, we'll update the `index.js` to send `fruits[i].id` in url parameter.
 
 ### 1. Generate model
 
+Before moving on to the next step, move the `models\users.js` file from models folder to the parent folder, that is directly under `fruit-app`.
+
 Lets use the Sequelize CLI `model:generate` command again to create a `User` model with `name`, `username` and `password` attributes:
 
 `sequelize model:generate --name User --attributes name:string,username:string,password:string`
