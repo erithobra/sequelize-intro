@@ -579,7 +579,7 @@ Lets use the Sequelize CLI `model:generate` command again to create a `User` mod
 
 Just like before two files will be created- `models/user.js` and `migrations/XXXXXXX-create-user.js`. 
 
-```
+```js
 'use strict';
 const {
   Model
@@ -609,7 +609,7 @@ module.exports = (sequelize, DataTypes) => {
 
 Just like earlier we'll add default values to `createdAt` and `updatedAt`.
 
-```
+```js
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -669,7 +669,7 @@ Just to confirm, let's go into the `psql` shell and confirm that a `Users` table
 
 Fill the empty seeders file.
 
-```
+```js
 'use strict';
 
 module.exports = {
@@ -728,7 +728,7 @@ Now that we have created our `User` model in the database. We will update the us
 
 Just like earlier, don't forget to import `User` model in `controllers/users.js`.
 
-```
+```js
 const User = require('../models').User;
 ```
 
