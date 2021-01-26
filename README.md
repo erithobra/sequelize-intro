@@ -517,7 +517,7 @@ We will also update `edit.ejs` view to send `fruit.id` in url path as parameter 
 ...
 ```
 
-Npw that we are sending the right fruit id we will update the `editFruit()` that updates the fruit in our database
+Now that we are sending the right fruit id we will update the `editFruit()` that updates the fruit in our database
 
 Previously,
 
