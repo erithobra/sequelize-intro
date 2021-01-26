@@ -498,7 +498,7 @@ const renderEdit = (req, res) => {
 
 Now,
 
-```
+```js
 const renderEdit = (req, res) => {
     Fruit.findByPk(req.params.index)
     .then(fruit => {
